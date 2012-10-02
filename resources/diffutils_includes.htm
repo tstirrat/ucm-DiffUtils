@@ -1,0 +1,46 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>
+DiffUtils htmlIncludeOrString
+</title>
+</head>
+<body>
+
+<@ dynamichtml setup_doc_revisions_table_header @>
+    <$ include super.setup_doc_revisions_table_header $>
+    
+    <$ exec rsFindRowPrimary("ColumnProperties", "dInDate") $>
+    
+    <$exec rsInsertNewRow("ColumnProperties")$>
+    <$exec setValue("ColumnProperties", "id", "diffutils")$>
+    <$exec setValue("ColumnProperties", "width", "75px")$>
+    <$exec setValue("ColumnProperties", "headerLabel", "Compare")$>
+    <$exec setValue("ColumnProperties", "rowAlign", "center")$>
+<@ end @>
+
+<@ dynamichtml setup_doc_revisions_table_row @>
+    <$ include super.setup_doc_revisions_table_row $>
+    <$ setValue("RowData", "diffutils", "<$ include diffutils_revision_actions $>") $>
+<@ end @>
+
+<@ dynamichtml diffutils_revision_actions @>
+    [[% Is this the currently selected revsion? %]]
+    <$ if dID != #local.dID $>
+        <$ id1 = dID $>
+        <$ id2 = #local.dID $>
+        [[% ensure the right side is later than the left %]]
+        <$ if id1 > id2 $>
+            <$ id1 = #local.dID $>
+            <$ id2 = dID $>
+        <$ endif $>
+        
+        <a href="?IdcService=DIFF_REVISIONS&id1=<$ id1 $>&id2=<$ id2 $>" class="xuiLinkText2_Sm"><$lc("wwCompare")$></a>
+    <$ else $>
+    --
+    <$ endif $>
+<@ end @>
+
+<@wwCompare=Compare@>
+
+</body></html>

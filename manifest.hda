@@ -1,0 +1,17 @@
+﻿<?hda version="10.1.3.5.1 (110524)" jcharset=UTF8 encoding=utf-8?>
+@Properties LocalData
+blFieldTypes=
+blDateFormat=dd/MM/yyyy {H:mm[:ss] [zzz]}!tAustralia/Sydney
+@end
+@ResultSet Manifest
+2
+entryType
+location
+component
+DiffUtils/DiffUtils.hda
+componentExtra
+DiffUtils/readme.txt
+componentLib
+DiffUtils/lib/
+@end
+

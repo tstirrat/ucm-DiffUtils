@@ -1,0 +1,61 @@
+﻿<?hda version="10.1.3.5.1 (110524)" jcharset=UTF8 encoding=utf-8?>
+@Properties LocalData
+version=1.0-SNAPSHOT $Rev: $
+classpath=$COMPONENT_DIR/lib/DiffUtils-1.0-SNAPSHOT.jar;$COMPONENT_DIR/lib/diffutils-1.2.1.jar;$COMPONENT_DIR/lib/commons-lang-2.6.jar;$COMPONENT_DIR/lib/ucm-twine-0.9.1-SNAPSHOT.jar;
+blFieldTypes=
+ComponentName=DiffUtils
+hasPreferenceData=false
+blDateFormat=dd/MM/yyyy {H:mm[:ss] [zzz]}!tAustralia/Sydney
+@end
+@ResultSet ResourceDefinition
+4
+type
+filename
+tables
+loadOrder
+template
+templates/diffutils_templates.hda
+null
+10
+resource
+resources/diffutils_includes.htm
+null
+10
+resource
+resources/diffutils_tables.htm
+null
+10
+@end
+@ResultSet Filters
+4
+type
+location
+parameter
+loadOrder
+extraAfterConfigInit
+org.ucmtwine.Bootstrapper
+diffutils.properties
+1000
+@end
+@ResultSet MergeRules
+4
+fromTable
+toTable
+column
+loadOrder
+DiffUtils_Templates
+IntradocTemplates
+name
+10
+DiffUtils_TracingSections
+IdcTracingSections
+itsSection
+10
+@end
+@ResultSet ClassAliases
+3
+classname
+location
+loadOrder
+@end
+

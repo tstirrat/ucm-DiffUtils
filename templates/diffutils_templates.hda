@@ -1,0 +1,19 @@
+﻿<?hda version="10.1.3.5.1 (110524)" jcharset=UTF8 encoding=utf-8?>
+@Properties LocalData
+blFieldTypes=
+blDateFormat=dd/MM/yyyy {H:mm[:ss] [zzz]}!tAustralia/Sydney
+@end
+@ResultSet DiffUtils_Templates
+5
+name
+class
+formtype
+filename
+description
+TPL_DIFF_RESULT
+Pages
+Form
+tpl_diff_result.html
+Diff output template
+@end
+
