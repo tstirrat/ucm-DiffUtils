@@ -2,3 +2,4 @@ target/
 lockwait.dat
 manifest.zip
 DiffUtils.zip
+lib/
