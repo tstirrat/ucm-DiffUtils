@@ -4,9 +4,9 @@ import intradoc.common.ServiceException;
 import intradoc.common.SystemUtils;
 import intradoc.data.DataBinder;
 import intradoc.data.DataException;
-import intradoc.data.Workspace;
 import intradoc.filestore.FileStoreProvider;
 import intradoc.provider.Provider;
+import intradoc.provider.ServerRequestUtils;
 import intradoc.server.DirectoryLocator;
 import intradoc.server.Service;
 
@@ -54,7 +54,7 @@ public class DiffServices {
    * @throws DataException
    * @throws ServiceException
    */
-  @ServiceMethod(name = "DIFF_PROVIDER")
+  @ServiceMethod(name = "DIFF_PROVIDER", template = "TPL_DIFF_RESULT")
   public String diffExternal(@Binder(name = "dID") long dID, @Binder(name = "providerName") Provider provider,
       Service service) throws ServiceException, DataException {
 
@@ -64,12 +64,23 @@ public class DiffServices {
 
     String localFile = getFileNameFromRevision(dID, service);
 
-    String remoteFile = null;
+    DataBinder requestBinder = new DataBinder();
+    DataBinder responseBinder = new DataBinder();
 
-    // TODO: get the file dammit.
+    requestBinder.putLocal("IdcService", "GET_FILE");
+    requestBinder.putLocal("dDocName", service.getBinder().getLocal("dDocName"));
+    requestBinder.putLocal("RevisionSelectionMethod", "Latest");
+    ServerRequestUtils.doAdminProxyRequest(provider, requestBinder, responseBinder, service);
+
+    if (responseBinder.getLocal("downloadFile:path") == null) {
+      throw new ServiceException("Unable to determine latest revision of item using outgoing provider '"
+          + provider.getName());
+    }
+
+    String remoteFile = responseBinder.getLocal("downloadFile:path");
 
     if (remoteFile == null) {
-      return "";
+      return remoteFile;
     }
 
     return diffFiles(remoteFile, localFile, service.getBinder());
@@ -138,9 +149,10 @@ public class DiffServices {
 
     String fileName = String.valueOf(revisionId) + "."
         + service.getBinder().getResultSetValue(service.getBinder().getResultSet("DOC_INFO"), "dExtension");
+    String vaultFile = DirectoryLocator.computeDirectory(service.getBinder(), FileStoreProvider.R_PRIMARY) + fileName;
     service.getBinder().removeResultSet("DOC_INFO");
     service.getBinder().removeResultSet("REVISION_HISTORY");
-    return DirectoryLocator.computeDirectory(service.getBinder(), FileStoreProvider.R_PRIMARY) + fileName;
+    return vaultFile;
   }
 
   /**
