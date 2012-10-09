@@ -12,11 +12,11 @@ DiffUtils htmlIncludeOrString
     
     <$ exec rsFindRowPrimary("ColumnProperties", "dInDate") $>
     
-    <$exec rsInsertNewRow("ColumnProperties")$>
-    <$exec setValue("ColumnProperties", "id", "diffutils")$>
-    <$exec setValue("ColumnProperties", "width", "75px")$>
-    <$exec setValue("ColumnProperties", "headerLabel", "Compare")$>
-    <$exec setValue("ColumnProperties", "rowAlign", "center")$>
+    <$ exec rsInsertNewRow("ColumnProperties") $>
+    <$ exec setValue("ColumnProperties", "id", "diffutils") $>
+    <$ exec setValue("ColumnProperties", "width", "75px") $>
+    <$ exec setValue("ColumnProperties", "headerLabel", "Compare") $>
+    <$ exec setValue("ColumnProperties", "rowAlign", "center") $>
 <@ end @>
 
 <@ dynamichtml setup_doc_revisions_table_row @>
@@ -33,14 +33,48 @@ DiffUtils htmlIncludeOrString
         <$ if id1 > id2 $>
             <$ id1 = #local.dID $>
             <$ id2 = dID $>
-        <$ endif $>
+        <$ endif $> 
         
-        <a href="?IdcService=DIFF_REVISIONS&id1=<$ id1 $>&id2=<$ id2 $>" class="xuiLinkText2_Sm"><$lc("wwCompare")$></a>
+        <a href="?IdcService=DIFF_REVISIONS&id1=<$ id1 $>&id2=<$ id2 $>" class="xuiLinkText2_Sm" target="_blank" class="diff"><$lc("wwCompare")$></a>
     <$ else $>
     --
     <$ endif $>
 <@ end @>
 
 <@wwCompare=Compare@>
+<@wwCompareTo=Compare To@>
+
+<@ dynamichtml custom_docinfo_menus_setup @>
+    <$ include super.custom_docinfo_menus_setup $>
+
+	<$ executeService("GET_ALL_PROVIDERS") $>
+	<$ count = 0 $>
+	<$ compareMenuCreated = 0 $>
+	<$ loop Providers $>
+	   [[% Only show outgoing (non-refinery) type providers %]]
+	   <$ if strEquals(ProviderType, "outgoing") and not isTrue(IsRefinery) $>
+	       <$ if not isTrue(compareMenuCreated) $>
+	           <$exec rsAppendNewRow("PageMenusData")$>
+			    <$PageMenusData.nodeId = "DIFF_OPTIONS"$>
+			    <$PageMenusData.parentId = "CONTENT_ACTIONS"$>
+			    <$PageMenusData.label = "wwCompareTo"$>
+			    <$PageMenusData.type = "collection"$>
+			    <$PageMenusData.loadOrder = 100$>
+	           <$ compareMenuCreated = 1 $>
+	       <$ endif $>
+	       
+	       <$exec rsAppendNewRow("PageMenusData")$>
+			<$PageMenusData.nodeId = "COMPARE_TO_" join ProviderName $>
+			<$PageMenusData.parentId = "DIFF_OPTIONS"$>
+			<$PageMenusData.label = ProviderName $>
+			<$PageMenusData.type = "item"$>
+			<$PageMenusData.href = "?IdcService=DIFF_EXTERNAL&dID=" join dID join "&provider=" join ProviderName $>
+			<$PageMenusData.target = "_blank"$>
+			<$PageMenusData.loadOrder = count$>
+			<$PageMenusData.class = "diff"$>
+	   <$ endif $>
+	<$ endloop $>
+
+<@ end @>
 
 </body></html>

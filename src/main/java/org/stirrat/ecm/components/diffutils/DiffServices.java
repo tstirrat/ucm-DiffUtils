@@ -1,11 +1,12 @@
 package org.stirrat.ecm.components.diffutils;
 
 import intradoc.common.ServiceException;
-import intradoc.common.SystemUtils;
 import intradoc.data.DataBinder;
 import intradoc.data.DataException;
+import intradoc.data.DataResultSet;
 import intradoc.filestore.FileStoreProvider;
 import intradoc.provider.Provider;
+import intradoc.provider.Providers;
 import intradoc.provider.ServerRequestUtils;
 import intradoc.server.DirectoryLocator;
 import intradoc.server.Service;
@@ -37,8 +38,6 @@ public class DiffServices {
   @ServiceMethod(name = "DIFF_REVISIONS", template = "TPL_DIFF_RESULT")
   public String diffRevisions(@Binder(name = "id1") long id1, @Binder(name = "id2") long id2, Service service)
       throws DataException, ServiceException {
-    SystemUtils.trace("diffutils", "Diffing revisions left: " + String.valueOf(id1) + " right:" + String.valueOf(id2));
-
     String file1 = getFileNameFromRevision(id1, service);
     String file2 = getFileNameFromRevision(id2, service);
 
@@ -49,14 +48,20 @@ public class DiffServices {
    * Diff a revision and the latest copy from a provider.
    * 
    * @param dID
-   * @param providerName
+   * @param provider
    * @return
    * @throws DataException
    * @throws ServiceException
    */
-  @ServiceMethod(name = "DIFF_PROVIDER", template = "TPL_DIFF_RESULT")
-  public String diffExternal(@Binder(name = "dID") long dID, @Binder(name = "providerName") Provider provider,
+  @ServiceMethod(name = "DIFF_EXTERNAL", template = "TPL_DIFF_RESULT")
+  public String diffExternal(@Binder(name = "dID") long dID, @Binder(name = "provider") String providerName,
       Service service) throws ServiceException, DataException {
+
+    Provider provider = Providers.getProvider(providerName);
+
+    if (provider == null || provider.isInError()) {
+      throw new DataException("Provider '" + providerName + "' is not found or in error");
+    }
 
     if (!provider.isProviderOfType("outgoing")) {
       throw new ServiceException("Provider '" + provider.getName() + "' must be an outgoing provider");
@@ -147,9 +152,14 @@ public class DiffServices {
 
     service.executeSafeServiceInNewContext("DOC_INFO", false);
 
-    String fileName = String.valueOf(revisionId) + "."
-        + service.getBinder().getResultSetValue(service.getBinder().getResultSet("DOC_INFO"), "dExtension");
-    String vaultFile = DirectoryLocator.computeDirectory(service.getBinder(), FileStoreProvider.R_PRIMARY) + fileName;
+    DataResultSet docInfo = (DataResultSet) service.getBinder().getResultSet("DOC_INFO");
+
+    String fileName = docInfo.getStringValueByName("dDocName").toLowerCase();
+    if (!docInfo.getStringValueByName("dReleaseState").equals("Y")) {
+      fileName += "~" + docInfo.getStringValueByName("dRevLabel");
+    }
+    fileName += "." + docInfo.getStringValueByName("dWebExtension");
+    String vaultFile = DirectoryLocator.computeDirectory(service.getBinder(), FileStoreProvider.R_WEB) + fileName;
     service.getBinder().removeResultSet("DOC_INFO");
     service.getBinder().removeResultSet("REVISION_HISTORY");
     return vaultFile;
