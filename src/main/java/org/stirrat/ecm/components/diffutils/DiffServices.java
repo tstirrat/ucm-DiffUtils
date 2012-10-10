@@ -26,6 +26,8 @@ import difflib.Patch;
 
 public class DiffServices {
 
+  private static final int DEFAULT_CONTEXT_LINE_COUNT = 3;
+
   /**
    * Diff two different revisions of the same content item.
    * 
@@ -106,7 +108,7 @@ public class DiffServices {
 
     Patch patch = DiffUtils.diff(file1Content, file2Content);
 
-    List<String> uDiff = DiffUtils.generateUnifiedDiff(file1, file2, file1Content, patch, 10);
+    List<String> uDiff = DiffUtils.generateUnifiedDiff(file1, file2, file1Content, patch, DEFAULT_CONTEXT_LINE_COUNT);
 
     StringBuilder diffOutput = new StringBuilder();
     StringBuilder diffHtml = new StringBuilder();
