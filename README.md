@@ -9,9 +9,12 @@ Features
 --------
 
 - Get a unified diff between two revisons.
+  
   ![Comparing Revisions](https://github.com/tstirrat/ucm-DiffUtils/raw/master/readme/images/docinfo_compare_rev.png "Comparing Revisions")
+  
 
 - Get a unified diff of a content item between two UCM instances.
+  
   ![Comparing To External Server](https://github.com/tstirrat/ucm-DiffUtils/raw/master/readme/images/docinfo_compare_ext.png "Comparing To External Server")
 
 - (Not implemented, yet) Get a unified diff of multiple of items in batch.
