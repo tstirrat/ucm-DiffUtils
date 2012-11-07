@@ -99,7 +99,8 @@
 		<dependency>
 			<groupId>org.ucmtwine</groupId>
 			<artifactId>ucm-twine</artifactId>
-			<version>0.9.0</version>
+			<version>0.9.1</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.java-diff-utils</groupId>
