@@ -52,7 +52,7 @@ DiffUtils htmlIncludeOrString
 	<$ compareMenuCreated = 0 $>
 	<$ loop Providers $>
 	   [[% Only show outgoing (non-refinery) type providers %]]
-	   <$ if strEquals(ProviderType, "outgoing") and not isTrue(IsRefinery) $>
+	   <$ if strEquals(ProviderType, "outgoing") and not isTrue(IsRefinery) and isTrue(IsEnabled) and isTrue(IsReady) $>
 	       <$ if not isTrue(compareMenuCreated) $>
 	           <$exec rsAppendNewRow("PageMenusData")$>
 			    <$PageMenusData.nodeId = "DIFF_OPTIONS"$>
@@ -77,4 +77,65 @@ DiffUtils htmlIncludeOrString
 
 <@ end @>
 
+<@ dynamichtml custom_searchapi_result_menus_setup @>
+  <$ include super.custom_searchapi_result_menus_setup $>
+  
+  <$ if IsLoggedIn $>
+    <$ executeService("GET_ALL_PROVIDERS") $>
+    <$ count = 0 $>
+    <$ compareMenuCreated = 0 $>
+    
+    <$ DiffQueryOptions = "" $>
+    
+    <$ if QueryText $><$ DiffQueryOptions = DiffQueryOptions join "&QueryText=" join QueryText $><$ endif $>
+    
+    <$ if SortOrder $><$ DiffQueryOptions = DiffQueryOptions join "&SortOrder=" join url(SortOrder) $><$ endif $>
+    <$ if SortField $><$ DiffQueryOptions = DiffQueryOptions join "&SortField=" join url(SortField) $><$ endif $>
+    <$ if ResultCount $><$ DiffQueryOptions = DiffQueryOptions join "&ResultCount=" join ResultCount $><$ endif $>
+    <$ if SearchProviders $><$ DiffQueryOptions = DiffQueryOptions join "&SearchProviders=" join url(SearchProviders) $><$ endif $>
+    <$ if SearchEngineName $><$ DiffQueryOptions = DiffQueryOptions join "&SearchEngineName=" join SearchEngineName $><$ endif $>
+    <$ if Repository $><$ DiffQueryOptions = DiffQueryOptions join "&Repository=" join Repository $><$ endif $>
+    <$ if SearchQueryFormat $><$ DiffQueryOptions = DiffQueryOptions join "&SearchQueryFormat=" join SearchQueryFormat $><$ endif $>
+    
+    <$ loop Providers $>
+      [[% Only show outgoing (non-refinery) type providers %]]
+      <$ if strEquals(ProviderType, "outgoing") and not isTrue(IsRefinery) and isTrue(IsEnabled) and isTrue(IsReady) $>
+        <$ if not isTrue(compareMenuCreated) $>
+          <$ exec rsAppendNewRow("PageMenusData") $>
+          <$ PageMenusData.nodeId = "DIFF_OPTIONS" $>
+          <$ PageMenusData.parentId = "QUERY_ACTIONS" $>
+          <$ PageMenusData.label = "wwCompareTo" $>
+          <$ PageMenusData.type = "collection" $>
+          <$ PageMenusData.loadOrder = 100 $>
+          <$ compareMenuCreated = 1 $>
+        <$ endif $>
+       
+        <$exec rsAppendNewRow("PageMenusData")$>
+        <$PageMenusData.nodeId = "COMPARE_TO_" join ProviderName $>
+        <$PageMenusData.parentId = "DIFF_OPTIONS"$>
+        <$PageMenusData.label = ProviderName $>
+        <$PageMenusData.type = "item"$>
+        <$PageMenusData.href = "?IdcService=DIFF_SEARCH_RESULTS&provider=" join ProviderName join DiffQueryOptions $>
+        <$PageMenusData.target = ""$>
+        <$PageMenusData.loadOrder = count$>
+        <$PageMenusData.class = "diff"$>
+     <$ endif $>
+  <$ endloop $>
+  <$ endif $>
+<@ end @>
+
+
+<@ dynamichtml extra_setup_search_results_action_popups @>
+  <$ include super.extra_setup_search_results_action_popups $>
+  
+  [[% hide -- not ready
+  <$ exec rsAppendNewRow("PopupProps") $>
+  <$ exec setValue("PopupProps", "label", lc("wwCompareTo")) $>
+  <$ exec setValue("PopupProps", "function", "<$SearchHttpCgiPath$>?IdcService=CHECKOUT&dID=<$url(dID)$>&dDocName=<$url(dDocName)$>&dDocTitle=<$url(dDocTitle)$>") $>
+  <$ exec setValue("PopupProps", "ifClause", "not isExternallyManagedDoc and not noSearchCheckout") $>
+  <$ exec setValue("PopupProps", "linkTarget", "<$docLinkTarget$>") $>
+  <$ exec setValue("PopupProps", "class", "document") $>
+  <$ exec setValue("PopupProps", "id", "compare-to") $>
+  %]]
+<@ end @>
 </body></html>
